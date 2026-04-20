@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aurum — Sign In</title>
+<title>1A3 Class Server — Sign In</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -90,14 +90,13 @@
 
 <div class="layout">
 
-  <!-- Left decorative panel -->
   <div class="panel-left">
     <div class="brand-mark">
       <div class="brand-icon"><span></span></div>
-      <div class="brand-name">Aurum</div>
+      <div class="brand-name">1A3 Class Server</div>
     </div>
-    <h1 class="headline">Refined<br>access for<br><em>distinguished</em><br>members.</h1>
-    <p class="tagline">A curated experience reserved<br>for those who appreciate<br>the finer detail in everything.</p>
+    <h1 class="headline">Your class.<br>Your space.<br><em>Elevated</em><br>access.</h1>
+    <p class="tagline">A dedicated server reserved<br>for 1A3 members — curated,<br>private, and always ready.</p>
     <div class="diamonds">
       <div class="diamond" style="width:60px;height:60px;left:0;top:0;"></div>
       <div class="diamond" style="width:36px;height:36px;left:70px;top:30px;opacity:.6;"></div>
@@ -105,14 +104,13 @@
     </div>
   </div>
 
-  <!-- Right login panel -->
   <div class="panel-right">
     <div class="login-card">
 
       <div class="login-header">
         <div class="divider-line"><div class="divider-gem"></div></div>
         <h2 class="login-title" id="formTitle">Sign In</h2>
-        <p class="login-subtitle" id="formSubtitle">Welcome back</p>
+        <p class="login-subtitle" id="formSubtitle">Welcome back, 1A3</p>
       </div>
 
       <div class="tabs">
@@ -164,11 +162,6 @@
 </div>
 
 <script>
-  // ┌─────────────────────────────────────────────────────┐
-  // │  CHANGE THIS to your server's address               │
-  // │  e.g. 'https://my-app.railway.app'                  │
-  // │  or   'http://localhost:3000' for local development │
-  // └─────────────────────────────────────────────────────┘
   const SERVER_URL = 'https://tristan-3.onrender.com';
 
   let mode = 'login';
@@ -179,7 +172,7 @@
       t.classList.toggle('active', (i === 0) === (newMode === 'login'))
     );
     document.getElementById('formTitle').textContent    = newMode === 'login' ? 'Sign In' : 'Create Account';
-    document.getElementById('formSubtitle').textContent = newMode === 'login' ? 'Welcome back' : 'Join Aurum';
+    document.getElementById('formSubtitle').textContent = newMode === 'login' ? 'Welcome back, 1A3' : 'Join 1A3 Class Server';
     document.getElementById('btnText').textContent      = newMode === 'login' ? 'Sign In' : 'Create Account';
     document.getElementById('confirmGroup').style.display = newMode === 'register' ? 'block' : 'none';
     document.getElementById('loginOptions').style.display = newMode === 'login'    ? 'flex'  : 'none';
@@ -217,7 +210,6 @@
     btnText.textContent = mode === 'login' ? 'Verifying…' : 'Creating account…';
 
     try {
-      // Sends email + password to your separate server
       const endpoint = mode === 'login'
         ? `${SERVER_URL}/api/login`
         : `${SERVER_URL}/api/register`;
@@ -226,7 +218,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
-        credentials: 'include'   // sends the session cookie back
+        credentials: 'include'
       });
 
       const data = await res.json();
@@ -244,8 +236,8 @@
             : `Account created for ${data.email}`,
           'success-msg'
         );
-        // Redirect to dashboard after short delay
-        setTimeout(() => { window.location.href = `${SERVER_URL}/dashboard`; }, 1200);
+        // Redirect to the 1A3 dashboard after short delay
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
       }
     } catch (err) {
       showMsg('Could not reach the server. Is server.js running?', 'error');
