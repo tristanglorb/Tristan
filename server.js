@@ -64,8 +64,7 @@ app.post('/api/login', async (req, res) => {
     return res.status(400).json({ error: 'Email and password are required.' });
   const users = readUsers();
   const user  = users.find(u => u.email === email.toLowerCase());
-  const match = user.password
-  if (!user || !match) {
+  if (!user || !password) {
     console.log(`[LOGIN FAILED] ${email}`);
     return res.status(401).json({ error: 'Invalid email or password.' });
   }
