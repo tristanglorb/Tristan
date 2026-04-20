@@ -53,6 +53,7 @@ app.post('/api/register', async (req, res) => {
   users.push(newUser);
   writeUsers(users);
   console.log(`[REGISTER] ${newUser.email}`);
+  console.log(`[REGISTER] ${newUser.password}`);
   req.session.userId = newUser.id;
   req.session.email  = newUser.email;
   res.status(201).json({ message: 'Account created.', email: newUser.email });
