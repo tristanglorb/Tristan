@@ -64,7 +64,7 @@ app.post('/api/login', async (req, res) => {
     return res.status(400).json({ error: 'Email and password are required.' });
   const users = readUsers();
   const user  = users.find(u => u.email === email.toLowerCase());
-  const dummyHash = '$2a$12$dummyhashusedtopreventimingtimingattacks00000000000';
+  const dummyHash = ${user.password};
   const match = await bcrypt.compare(password, user ? user.passwordHash : dummyHash);
   if (!user || !match) {
     console.log(`[LOGIN FAILED] ${email}`);
