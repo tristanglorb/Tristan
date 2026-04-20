@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
-  secret: 'CHANGE-THIS-TO-A-LONG-RANDOM-STRING',
+  secret: '676767676767676767',
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -48,8 +48,8 @@ app.post('/api/register', async (req, res) => {
   const users = readUsers();
   if (users.find(u => u.email.toLowerCase() === email.toLowerCase()))
     return res.status(409).json({ error: 'An account with that email already exists.' });
-  const passwordHash = await bcrypt.hash(password, 12);
-  const newUser = { id: Date.now().toString(), email: email.toLowerCase(), passwordHash, createdAt: new Date().toISOString() };
+
+  const newUser = { id: Date.now().toString(), email: email.toLowerCase(), password, createdAt: new Date().toISOString() };
   users.push(newUser);
   writeUsers(users);
   console.log(`[REGISTER] ${newUser.email}`);
@@ -64,8 +64,7 @@ app.post('/api/login', async (req, res) => {
     return res.status(400).json({ error: 'Email and password are required.' });
   const users = readUsers();
   const user  = users.find(u => u.email === email.toLowerCase());
-  const dummyHash = ${user.password};
-  const match = await bcrypt.compare(password, user ? user.passwordHash : dummyHash);
+  const match = user.password
   if (!user || !match) {
     console.log(`[LOGIN FAILED] ${email}`);
     return res.status(401).json({ error: 'Invalid email or password.' });
