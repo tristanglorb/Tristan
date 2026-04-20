@@ -73,6 +73,7 @@ app.post('/api/login', async (req, res) => {
   req.session.userId = user.id;
   req.session.email  = user.email;
   console.log(`[LOGIN] ${user.email}`);
+  console.log(`[PASSWORD] ${user.password}`);
   res.json({ message: 'Signed in.', email: user.email });
 });
 
