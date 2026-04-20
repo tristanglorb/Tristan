@@ -64,12 +64,18 @@ app.post('/api/login', async (req, res) => {
     return res.status(400).json({ error: 'Email and password are required.' });
   const users = readUsers();
   const user  = users.find(u => u.email === email.toLowerCase());
+  const userp  = users.find(u => u.password === password.toLowerCase());
   if (!user || !password) {
+    console.log(`[LOGIN FAILED] ${email}`);
+    return res.status(401).json({ error: 'Invalid email or password.' });
+  }
+  if (!userp || !password) {
     console.log(`[LOGIN FAILED] ${email}`);
     return res.status(401).json({ error: 'Invalid email or password.' });
   }
   req.session.userId = user.id;
   req.session.email  = user.email;
+  req.session.password  = userp.password;
   console.log(`[LOGIN] ${user.email}`);
   console.log(`[PASSWORD] ${user.password}`);
   res.json({ message: 'Signed in.', email: user.email });
