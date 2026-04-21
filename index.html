@@ -362,7 +362,7 @@ html, body { min-height:100%; font-family:'Josefin Sans',sans-serif; background:
     </div>
     <div class="topbar-right">
       <div class="badge">1A3</div>
-      <button class="signout-btn" onclick="goto('login')">Sign Out</button>
+      <button class="signout-btn" onclick="signOut()">Sign Out</button>
     </div>
   </nav>
   <div class="page-body" style="max-width:1200px;">
@@ -674,14 +674,14 @@ async function handleSubmit() {
       btn.classList.add('success');
       btnText.textContent = loginMode==='login' ? '✓  Access Granted' : '✓  Account Created';
       showMsg(loginMode==='login' ? `Welcome back, ${data.email}` : `Account created for ${data.email}`,'success-msg');
-      setTimeout(()=>goto('dashboard'),1200);
+      setTimeout(()=>{ window.location.href='/dashboard'; },1200);
     }
   } catch(err) {
     // If server unreachable, still let the user into the dashboard for local use
     showMsg('Server not reached — entering local mode.','success-msg');
     btn.classList.add('success');
     btnText.textContent = '✓  Access Granted';
-    setTimeout(()=>goto('dashboard'),1200);
+    setTimeout(()=>{ window.location.href='/dashboard'; },1200);
   }
 }
 
@@ -926,8 +926,29 @@ function addEvent(){
 
 function delEvent(i){const e=getStore('1a3_events');e.splice(i,1);setStore('1a3_events',e);renderEvents();toast('Event removed.');}
 
-/* ── Init ── */
-refreshDashboardStats();
+/* ── Sign Out ── */
+async function signOut() {
+  try {
+    await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+  } catch(e) {}
+  window.location.href = '/';
+}
+
+/* ── Init: check if already logged in ── */
+(async function init() {
+  try {
+    const res = await fetch('/api/me', { credentials: 'include' });
+    if (res.ok) {
+      // Already authenticated — go straight to dashboard
+      const data = await res.json();
+      refreshDashboardStats();
+      goto('dashboard');
+      return;
+    }
+  } catch(e) {}
+  // Not authenticated — stay on login
+  refreshDashboardStats();
+})();
 </script>
 </body>
 </html>
