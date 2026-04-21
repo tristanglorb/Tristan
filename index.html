@@ -3,84 +3,272 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1A3 Class Server — Sign In</title>
+<title>1A3 Class Server</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --gold: #c9a96e; --gold-light: #e8d5a3; --gold-dark: #8a6d3b;
-    --cream: #faf7f2; --dark: #0e0c09; --dark-2: #1a1713; --dark-3: #252119;
-    --text-muted: #8a8070; --text-soft: #c4b99a;
-  }
-  html, body { height: 100%; font-family: 'Josefin Sans', sans-serif; background: var(--dark); color: var(--cream); overflow: hidden; }
-  .bg { position: fixed; inset: 0; background: var(--dark); z-index: 0; }
-  .bg::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 15% 50%, rgba(201,169,110,.07) 0%, transparent 60%), radial-gradient(ellipse 60% 80% at 85% 50%, rgba(201,169,110,.05) 0%, transparent 60%); }
-  .grid-lines { position: fixed; inset: 0; z-index: 0; background-image: linear-gradient(rgba(201,169,110,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,169,110,.04) 1px, transparent 1px); background-size: 60px 60px; }
-  .corner { position: fixed; width: 120px; height: 120px; z-index: 1; opacity: .3; }
-  .corner svg { width: 100%; height: 100%; }
-  .corner-tl { top: 20px; left: 20px; }
-  .corner-tr { top: 20px; right: 20px; transform: scaleX(-1); }
-  .corner-bl { bottom: 20px; left: 20px; transform: scaleY(-1); }
-  .corner-br { bottom: 20px; right: 20px; transform: scale(-1); }
-  .layout { position: relative; z-index: 10; display: grid; grid-template-columns: 1fr 1fr; height: 100vh; }
-  .panel-left { display: flex; flex-direction: column; justify-content: center; padding: 60px 80px; position: relative; overflow: hidden; }
-  .panel-left::after { content: ''; position: absolute; right: 0; top: 10%; bottom: 10%; width: 1px; background: linear-gradient(to bottom, transparent, var(--gold), transparent); }
-  .brand-mark { display: flex; align-items: center; gap: 16px; margin-bottom: 60px; animation: fadeUp .8s ease forwards; }
-  .brand-icon { width: 42px; height: 42px; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; transform: rotate(45deg); }
-  .brand-icon span { display: block; width: 14px; height: 14px; background: var(--gold); transform: rotate(-45deg); }
-  .brand-name { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; letter-spacing: .3em; text-transform: uppercase; color: var(--gold-light); }
-  .headline { font-family: 'Cormorant Garamond', serif; font-size: clamp(42px,5vw,72px); font-weight: 300; line-height: 1.1; color: var(--cream); margin-bottom: 28px; animation: fadeUp .8s .15s ease both; }
-  .headline em { font-style: italic; color: var(--gold); }
-  .tagline { font-size: 12px; letter-spacing: .25em; text-transform: uppercase; color: var(--text-muted); line-height: 1.9; max-width: 320px; animation: fadeUp .8s .25s ease both; }
-  .diamonds { position: absolute; bottom: 80px; left: 80px; opacity: .15; animation: float 6s ease-in-out infinite; }
-  .diamond { position: absolute; border: 1px solid var(--gold); transform: rotate(45deg); }
-  .panel-right { display: flex; align-items: center; justify-content: center; padding: 60px; background: var(--dark-2); }
-  .login-card { width: 100%; max-width: 400px; animation: fadeUp .8s .1s ease both; }
-  .login-header { margin-bottom: 36px; text-align: center; }
-  .divider-line { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
-  .divider-line::before { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--gold-dark)); }
-  .divider-line::after  { content: ''; flex: 1; height: 1px; background: linear-gradient(to left,  transparent, var(--gold-dark)); }
-  .divider-gem { width: 10px; height: 10px; border: 1px solid var(--gold); transform: rotate(45deg); flex-shrink: 0; }
-  .login-title { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; letter-spacing: .15em; text-transform: uppercase; color: var(--cream); margin-bottom: 8px; }
-  .login-subtitle { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--text-muted); }
-  .tabs { display: flex; margin-bottom: 32px; border-bottom: 1px solid rgba(201,169,110,.15); }
-  .tab { flex: 1; background: none; border: none; color: var(--text-muted); font-family: 'Josefin Sans', sans-serif; font-size: 11px; letter-spacing: .25em; text-transform: uppercase; padding: 10px; cursor: pointer; transition: color .3s; position: relative; }
-  .tab.active { color: var(--gold); }
-  .tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px; background: var(--gold); }
-  .form-group { margin-bottom: 20px; position: relative; }
-  .form-label { display: block; font-size: 10px; letter-spacing: .25em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; transition: color .3s; }
-  .form-group:focus-within .form-label { color: var(--gold); }
-  .input-wrap { position: relative; }
-  .form-input { width: 100%; background: var(--dark-3); border: 1px solid rgba(201,169,110,.15); color: var(--cream); font-family: 'Josefin Sans', sans-serif; font-size: 13px; letter-spacing: .08em; padding: 14px 18px; outline: none; transition: border-color .3s, background .3s; border-radius: 0; }
-  .form-input::placeholder { color: rgba(196,185,154,.25); }
-  .form-input:focus { border-color: var(--gold); background: rgba(201,169,110,.04); }
-  .input-glow { position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: var(--gold); transform: scaleX(0); transition: transform .4s ease; transform-origin: left; }
-  .form-group:focus-within .input-glow { transform: scaleX(1); }
-  .form-options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
-  .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
-  .checkbox-label input[type="checkbox"] { display: none; }
-  .checkbox-box { width: 14px; height: 14px; border: 1px solid rgba(201,169,110,.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: border-color .3s; }
-  .forgot-link { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); text-decoration: none; cursor: pointer; transition: color .3s; }
-  .forgot-link:hover { color: var(--gold); }
-  .btn-main { width: 100%; background: transparent; border: 1px solid var(--gold); color: var(--gold-light); font-family: 'Josefin Sans', sans-serif; font-size: 11px; letter-spacing: .35em; text-transform: uppercase; padding: 16px 32px; cursor: pointer; position: relative; overflow: hidden; transition: color .4s; margin-bottom: 20px; }
-  .btn-main::before { content: ''; position: absolute; inset: 0; background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform .4s cubic-bezier(.4,0,.2,1); z-index: 0; }
-  .btn-main:hover::before { transform: scaleX(1); }
-  .btn-main:hover { color: var(--dark); }
-  .btn-main:disabled { opacity: .6; cursor: not-allowed; }
-  .btn-main span { position: relative; z-index: 1; }
-  .btn-main.success { border-color: #5a9e6f; color: #5a9e6f; }
-  .btn-main.success::before { background: rgba(90,158,111,.1); transform: scaleX(1); }
-  .msg { font-size: 11px; letter-spacing: .1em; text-align: center; margin-bottom: 16px; padding: 10px; opacity: 0; transform: translateY(-4px); transition: opacity .3s, transform .3s; }
-  .msg.show { opacity: 1; transform: translateY(0); }
-  .msg.error { color: #d97070; border: 1px solid rgba(217,112,112,.2); }
-  .msg.success-msg { color: #5a9e6f; border: 1px solid rgba(90,158,111,.2); }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
-  @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .panel-left { display: none; } .panel-right { background: var(--dark); padding: 40px 28px; } }
+/* ── Reset & Vars ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --gold:#c9a96e; --gold-light:#e8d5a3; --gold-dark:#8a6d3b;
+  --cream:#faf7f2; --dark:#0e0c09; --dark-2:#1a1713; --dark-3:#252119;
+  --text-muted:#8a8070; --text-soft:#c4b99a;
+}
+html, body { min-height:100%; font-family:'Josefin Sans',sans-serif; background:var(--dark); color:var(--cream); }
+
+/* ── Background ── */
+.bg { position:fixed; inset:0; background:var(--dark); z-index:0; }
+.bg::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 80% 60% at 15% 50%,rgba(201,169,110,.07) 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 85% 50%,rgba(201,169,110,.05) 0%,transparent 60%); }
+.grid-lines { position:fixed; inset:0; z-index:0; background-image:linear-gradient(rgba(201,169,110,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(201,169,110,.03) 1px,transparent 1px); background-size:60px 60px; }
+.corner { position:fixed; width:100px; height:100px; z-index:1; opacity:.2; pointer-events:none; }
+.corner svg { width:100%; height:100%; }
+.corner-tl{top:16px;left:16px;} .corner-tr{top:16px;right:16px;transform:scaleX(-1);}
+.corner-bl{bottom:16px;left:16px;transform:scaleY(-1);} .corner-br{bottom:16px;right:16px;transform:scale(-1);}
+
+/* ── Pages ── */
+.page-view { display:none; }
+.page-view.active { display:block; }
+#page-login.active { display:flex; flex-direction:column; min-height:100vh; }
+
+/* ── Topbar ── */
+.topbar { position:sticky; top:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:0 48px; height:64px; background:rgba(14,12,9,.9); backdrop-filter:blur(12px); border-bottom:1px solid rgba(201,169,110,.1); }
+.topbar-brand { display:flex; align-items:center; gap:14px; cursor:pointer; }
+.brand-icon { width:32px; height:32px; border:1px solid var(--gold); display:flex; align-items:center; justify-content:center; transform:rotate(45deg); flex-shrink:0; }
+.brand-icon span { display:block; width:10px; height:10px; background:var(--gold); transform:rotate(-45deg); }
+.brand-name { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:300; letter-spacing:.3em; text-transform:uppercase; color:var(--gold-light); }
+.topbar-nav { display:flex; gap:36px; }
+.nav-link { font-size:10px; letter-spacing:.25em; text-transform:uppercase; color:var(--text-muted); cursor:pointer; transition:color .3s; }
+.nav-link:hover,.nav-link.active { color:var(--gold); }
+.topbar-right { display:flex; align-items:center; gap:20px; }
+.badge { font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); border:1px solid rgba(201,169,110,.3); padding:5px 14px; }
+.signout-btn { font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted); cursor:pointer; transition:color .3s; background:none; border:none; font-family:'Josefin Sans',sans-serif; }
+.signout-btn:hover { color:var(--gold); }
+.back-link { font-size:10px; letter-spacing:.25em; text-transform:uppercase; color:var(--text-muted); cursor:pointer; transition:color .3s; }
+.back-link:hover { color:var(--gold); }
+
+/* ── Common page layout ── */
+.page-body { position:relative; z-index:10; padding:60px 48px 80px; max-width:1100px; margin:0 auto; }
+.page-header { margin-bottom:48px; animation:fadeUp .8s ease both; }
+.divider-line { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+.divider-line::before { content:''; flex:1; height:1px; background:linear-gradient(to right,transparent,var(--gold-dark)); }
+.divider-line::after  { content:''; flex:1; height:1px; background:linear-gradient(to left,transparent,var(--gold-dark)); }
+.divider-gem { width:8px; height:8px; border:1px solid var(--gold); transform:rotate(45deg); flex-shrink:0; }
+.page-title { font-family:'Cormorant Garamond',serif; font-size:clamp(36px,4vw,52px); font-weight:300; color:var(--cream); margin-bottom:10px; }
+.page-title em { font-style:italic; color:var(--gold); }
+.page-subtitle { font-size:11px; letter-spacing:.25em; text-transform:uppercase; color:var(--text-muted); }
+.section-head { display:flex; align-items:center; margin-bottom:20px; }
+.section-title { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:300; letter-spacing:.1em; color:var(--cream); }
+.section-line { flex:1; height:1px; background:linear-gradient(to right,rgba(201,169,110,.2),transparent); margin-left:24px; }
+
+/* ── Toast ── */
+.toast { position:fixed; bottom:32px; right:32px; z-index:999; background:var(--dark-2); border:1px solid rgba(201,169,110,.3); color:var(--gold-light); font-size:11px; letter-spacing:.15em; padding:14px 24px; opacity:0; transform:translateY(8px); transition:opacity .3s,transform .3s; pointer-events:none; }
+.toast.show { opacity:1; transform:translateY(0); }
+
+/* ─────────────────────────────────────────
+   LOGIN PAGE
+───────────────────────────────────────── */
+.login-layout { display:grid; grid-template-columns:1fr 1fr; flex:1; min-height:100vh; position:relative; z-index:10; overflow:hidden; }
+.panel-left { display:flex; flex-direction:column; justify-content:center; padding:60px 80px; position:relative; overflow:hidden; }
+.panel-left::after { content:''; position:absolute; right:0; top:10%; bottom:10%; width:1px; background:linear-gradient(to bottom,transparent,var(--gold),transparent); }
+.brand-mark { display:flex; align-items:center; gap:16px; margin-bottom:60px; animation:fadeUp .8s ease forwards; }
+.brand-mark .brand-icon { width:42px; height:42px; }
+.brand-mark .brand-icon span { width:14px; height:14px; }
+.brand-mark .brand-name { font-size:28px; }
+.headline { font-family:'Cormorant Garamond',serif; font-size:clamp(42px,5vw,72px); font-weight:300; line-height:1.1; color:var(--cream); margin-bottom:28px; animation:fadeUp .8s .15s ease both; }
+.headline em { font-style:italic; color:var(--gold); }
+.tagline { font-size:12px; letter-spacing:.25em; text-transform:uppercase; color:var(--text-muted); line-height:1.9; max-width:320px; animation:fadeUp .8s .25s ease both; }
+.diamonds { position:absolute; bottom:80px; left:80px; opacity:.15; animation:float 6s ease-in-out infinite; }
+.diamond { position:absolute; border:1px solid var(--gold); transform:rotate(45deg); }
+.panel-right { display:flex; align-items:center; justify-content:center; padding:60px; background:var(--dark-2); }
+.login-card { width:100%; max-width:400px; animation:fadeUp .8s .1s ease both; }
+.login-header { margin-bottom:36px; text-align:center; }
+.login-divider { display:flex; align-items:center; gap:16px; margin-bottom:28px; }
+.login-divider::before { content:''; flex:1; height:1px; background:linear-gradient(to right,transparent,var(--gold-dark)); }
+.login-divider::after  { content:''; flex:1; height:1px; background:linear-gradient(to left,transparent,var(--gold-dark)); }
+.login-gem { width:10px; height:10px; border:1px solid var(--gold); transform:rotate(45deg); flex-shrink:0; }
+.login-title { font-family:'Cormorant Garamond',serif; font-size:32px; font-weight:300; letter-spacing:.15em; text-transform:uppercase; color:var(--cream); margin-bottom:8px; }
+.login-subtitle { font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted); }
+.tabs { display:flex; margin-bottom:32px; border-bottom:1px solid rgba(201,169,110,.15); }
+.tab { flex:1; background:none; border:none; color:var(--text-muted); font-family:'Josefin Sans',sans-serif; font-size:11px; letter-spacing:.25em; text-transform:uppercase; padding:10px; cursor:pointer; transition:color .3s; position:relative; }
+.tab.active { color:var(--gold); }
+.tab.active::after { content:''; position:absolute; bottom:-1px; left:0; right:0; height:1px; background:var(--gold); }
+.form-group { margin-bottom:20px; position:relative; }
+.form-label { display:block; font-size:10px; letter-spacing:.25em; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px; transition:color .3s; }
+.form-group:focus-within .form-label { color:var(--gold); }
+.input-wrap { position:relative; }
+.form-input { width:100%; background:var(--dark-3); border:1px solid rgba(201,169,110,.15); color:var(--cream); font-family:'Josefin Sans',sans-serif; font-size:13px; letter-spacing:.08em; padding:14px 18px; outline:none; transition:border-color .3s,background .3s; border-radius:0; }
+.form-input::placeholder { color:rgba(196,185,154,.25); }
+.form-input:focus { border-color:var(--gold); background:rgba(201,169,110,.04); }
+.input-glow { position:absolute; bottom:0; left:0; right:0; height:1px; background:var(--gold); transform:scaleX(0); transition:transform .4s ease; transform-origin:left; }
+.form-group:focus-within .input-glow { transform:scaleX(1); }
+.form-options { display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; }
+.checkbox-label { display:flex; align-items:center; gap:10px; cursor:pointer; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-muted); }
+.checkbox-label input[type="checkbox"] { display:none; }
+.checkbox-box { width:14px; height:14px; border:1px solid rgba(201,169,110,.3); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.forgot-link { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-muted); cursor:pointer; transition:color .3s; }
+.forgot-link:hover { color:var(--gold); }
+.btn-main { width:100%; background:transparent; border:1px solid var(--gold); color:var(--gold-light); font-family:'Josefin Sans',sans-serif; font-size:11px; letter-spacing:.35em; text-transform:uppercase; padding:16px 32px; cursor:pointer; position:relative; overflow:hidden; transition:color .4s; margin-bottom:20px; }
+.btn-main::before { content:''; position:absolute; inset:0; background:var(--gold); transform:scaleX(0); transform-origin:left; transition:transform .4s cubic-bezier(.4,0,.2,1); z-index:0; }
+.btn-main:hover::before { transform:scaleX(1); }
+.btn-main:hover { color:var(--dark); }
+.btn-main:disabled { opacity:.6; cursor:not-allowed; }
+.btn-main span { position:relative; z-index:1; }
+.btn-main.success { border-color:#5a9e6f; color:#5a9e6f; }
+.btn-main.success::before { background:rgba(90,158,111,.1); transform:scaleX(1); }
+.status-msg { font-size:11px; letter-spacing:.1em; text-align:center; margin-bottom:16px; padding:10px; opacity:0; transform:translateY(-4px); transition:opacity .3s,transform .3s; }
+.status-msg.show { opacity:1; transform:translateY(0); }
+.status-msg.error { color:#d97070; border:1px solid rgba(217,112,112,.2); }
+.status-msg.success-msg { color:#5a9e6f; border:1px solid rgba(90,158,111,.2); }
+
+/* ─────────────────────────────────────────
+   DASHBOARD
+───────────────────────────────────────── */
+.stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1px; background:rgba(201,169,110,.08); margin-bottom:52px; animation:fadeUp .8s .1s ease both; }
+.stat-card { background:var(--dark-2); padding:28px 24px; position:relative; overflow:hidden; }
+.stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(to right,transparent,var(--gold),transparent); opacity:.3; }
+.stat-label { font-size:10px; letter-spacing:.25em; text-transform:uppercase; color:var(--text-muted); margin-bottom:14px; }
+.stat-value { font-family:'Cormorant Garamond',serif; font-size:42px; font-weight:300; color:var(--cream); line-height:1; margin-bottom:6px; }
+.stat-note { font-size:10px; letter-spacing:.15em; color:var(--text-muted); }
+.announce-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1px; background:rgba(201,169,110,.08); margin-bottom:52px; animation:fadeUp .8s .2s ease both; }
+.ann-card { background:var(--dark-2); padding:28px; }
+.ann-tag { font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:var(--gold); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+.ann-tag::before { content:''; display:block; width:16px; height:1px; background:var(--gold); }
+.ann-heading { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:300; color:var(--cream); margin-bottom:10px; line-height:1.35; }
+.ann-body { font-size:11px; letter-spacing:.06em; color:var(--text-muted); line-height:1.9; }
+.ann-date { font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:rgba(138,128,112,.5); margin-top:18px; }
+.schedule-wrap { animation:fadeUp .8s .3s ease both; margin-bottom:52px; }
+.schedule-table { width:100%; border-collapse:collapse; }
+.schedule-table th { font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:var(--text-muted); text-align:left; padding:10px 16px; border-bottom:1px solid rgba(201,169,110,.1); font-weight:400; }
+.schedule-table td { font-size:12px; letter-spacing:.08em; color:var(--cream); padding:16px; border-bottom:1px solid rgba(201,169,110,.05); vertical-align:middle; }
+.schedule-table tr:last-child td { border-bottom:none; }
+.schedule-table tr { transition:background .2s; }
+.schedule-table tr:hover td { background:rgba(201,169,110,.03); }
+.time-cell { color:var(--gold); font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:300; white-space:nowrap; }
+.room-cell { color:var(--text-muted); }
+.status-pill { display:inline-block; font-size:9px; letter-spacing:.2em; text-transform:uppercase; padding:4px 12px; }
+.status-now  { color:#5a9e6f; border:1px solid rgba(90,158,111,.3); }
+.status-next { color:var(--gold); border:1px solid rgba(201,169,110,.25); }
+.status-done { color:rgba(138,128,112,.4); border:1px solid rgba(138,128,112,.15); }
+.links-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1px; background:rgba(201,169,110,.08); animation:fadeUp .8s .4s ease both; }
+.link-card { background:var(--dark-2); padding:24px 20px; cursor:pointer; transition:background .3s; }
+.link-card:hover { background:var(--dark-3); }
+.link-icon { width:28px; height:28px; border:1px solid rgba(201,169,110,.2); display:flex; align-items:center; justify-content:center; transform:rotate(45deg); margin-bottom:16px; }
+.link-icon span { display:block; width:8px; height:8px; background:rgba(201,169,110,.4); transform:rotate(-45deg); }
+.link-title { font-size:10px; letter-spacing:.25em; text-transform:uppercase; color:var(--cream); margin-bottom:6px; }
+.link-desc { font-size:10px; letter-spacing:.1em; color:var(--text-muted); line-height:1.7; }
+
+/* ─────────────────────────────────────────
+   SHARED FORM STYLES (notes/hw/events)
+───────────────────────────────────────── */
+.panel { background:var(--dark-2); border:1px solid rgba(201,169,110,.08); padding:32px; margin-bottom:48px; animation:fadeUp .8s .1s ease both; }
+.f-row  { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.f-row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px; }
+.f-group { display:flex; flex-direction:column; gap:8px; }
+.f-label { font-size:10px; letter-spacing:.25em; text-transform:uppercase; color:var(--text-muted); }
+.f-input, .f-select, .f-textarea { background:var(--dark-3); border:1px solid rgba(201,169,110,.12); color:var(--cream); font-family:'Josefin Sans',sans-serif; font-size:12px; letter-spacing:.06em; padding:12px 16px; outline:none; transition:border-color .3s; width:100%; }
+.f-input::placeholder,.f-textarea::placeholder { color:rgba(196,185,154,.25); }
+.f-input:focus,.f-select:focus,.f-textarea:focus { border-color:var(--gold); }
+.f-select { cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23c9a96e' stroke-width='1.2'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:36px; }
+.f-select option { background:var(--dark-3); }
+.f-textarea { resize:vertical; min-height:90px; line-height:1.8; }
+.f-actions { display:flex; justify-content:flex-end; margin-top:16px; }
+.btn-gold { background:transparent; border:1px solid var(--gold); color:var(--gold-light); font-family:'Josefin Sans',sans-serif; font-size:10px; letter-spacing:.3em; text-transform:uppercase; padding:12px 32px; cursor:pointer; position:relative; overflow:hidden; transition:color .3s; }
+.btn-gold::before { content:''; position:absolute; inset:0; background:var(--gold); transform:scaleX(0); transform-origin:left; transition:transform .35s cubic-bezier(.4,0,.2,1); z-index:0; }
+.btn-gold:hover::before { transform:scaleX(1); }
+.btn-gold:hover { color:var(--dark); }
+.btn-gold span { position:relative; z-index:1; }
+.filter-bar { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; animation:fadeUp .8s .15s ease both; }
+.filter-btn { font-size:9px; letter-spacing:.25em; text-transform:uppercase; color:var(--text-muted); border:1px solid rgba(201,169,110,.1); background:none; padding:7px 18px; cursor:pointer; font-family:'Josefin Sans',sans-serif; transition:color .2s,border-color .2s; }
+.filter-btn.active,.filter-btn:hover { color:var(--gold); border-color:rgba(201,169,110,.35); }
+.empty-state { text-align:center; padding:60px 24px; }
+.empty-label { font-size:11px; letter-spacing:.25em; text-transform:uppercase; color:rgba(138,128,112,.4); }
+.btn-del { font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:rgba(217,112,112,.4); background:none; border:none; cursor:pointer; font-family:'Josefin Sans',sans-serif; transition:color .2s; }
+.btn-del:hover { color:#d97070; }
+.btn-action { font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted); background:none; border:1px solid rgba(201,169,110,.1); padding:6px 14px; cursor:pointer; font-family:'Josefin Sans',sans-serif; transition:color .2s,border-color .2s; }
+.btn-action:hover { color:var(--gold); border-color:rgba(201,169,110,.35); }
+
+/* ── Notes ── */
+.upload-zone { border:1px dashed rgba(201,169,110,.3); background:var(--dark-2); padding:48px 32px; text-align:center; cursor:pointer; transition:border-color .3s,background .3s; position:relative; }
+.upload-zone:hover,.upload-zone.dragover { border-color:var(--gold); background:rgba(201,169,110,.04); }
+.upload-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+.upload-icon { width:48px; height:48px; border:1px solid rgba(201,169,110,.25); display:flex; align-items:center; justify-content:center; transform:rotate(45deg); margin:0 auto 20px; }
+.upload-icon span { display:block; width:16px; height:16px; border:1px solid var(--gold); transform:rotate(-45deg); position:relative; }
+.upload-icon span::after { content:'+'; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:14px; color:var(--gold); font-family:'Josefin Sans',sans-serif; line-height:1; }
+.upload-label { font-size:12px; letter-spacing:.25em; text-transform:uppercase; color:var(--text-soft); margin-bottom:8px; }
+.upload-hint  { font-size:10px; letter-spacing:.15em; color:var(--text-muted); }
+.upload-meta  { display:flex; gap:12px; margin-top:16px; }
+.file-list    { display:flex; flex-direction:column; gap:1px; background:rgba(201,169,110,.06); }
+.file-item    { background:var(--dark-2); display:flex; align-items:center; gap:20px; padding:18px 24px; transition:background .2s; }
+.file-item:hover { background:var(--dark-3); }
+.file-ext  { font-family:'Cormorant Garamond',serif; font-size:13px; font-weight:600; color:var(--gold); width:36px; text-align:center; flex-shrink:0; text-transform:uppercase; border:1px solid rgba(201,169,110,.2); padding:4px 0; }
+.file-info { flex:1; min-width:0; }
+.file-name { font-size:12px; letter-spacing:.08em; color:var(--cream); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.file-meta { font-size:10px; letter-spacing:.15em; color:var(--text-muted); }
+.file-actions { display:flex; gap:12px; flex-shrink:0; }
+
+/* ── Homework ── */
+.entry-list { display:flex; flex-direction:column; gap:1px; background:rgba(201,169,110,.06); }
+.entry { background:var(--dark-2); padding:24px 28px; transition:background .2s; }
+.entry:hover { background:var(--dark-3); }
+.entry-top { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:12px; }
+.entry-subject { font-size:9px; letter-spacing:.3em; text-transform:uppercase; color:var(--gold); display:flex; align-items:center; gap:8px; }
+.entry-subject::before { content:''; display:block; width:12px; height:1px; background:var(--gold); }
+.entry-meta { font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:rgba(138,128,112,.5); }
+.entry-text { font-size:12px; letter-spacing:.06em; color:var(--cream); line-height:1.9; white-space:pre-wrap; }
+.entry-footer { display:flex; align-items:center; justify-content:space-between; margin-top:14px; }
+.entry-author { font-size:10px; letter-spacing:.15em; color:var(--text-muted); }
+.due-chip { font-size:9px; letter-spacing:.2em; text-transform:uppercase; padding:4px 12px; border:1px solid rgba(201,169,110,.2); color:var(--text-soft); }
+.due-chip.due-soon  { border-color:rgba(217,112,112,.3); color:#d97070; }
+.due-chip.due-today { border-color:rgba(201,169,110,.5); color:var(--gold); }
+
+/* ── Events ── */
+.events-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1px; background:rgba(201,169,110,.06); }
+.event-card { background:var(--dark-2); padding:28px; position:relative; transition:background .2s; }
+.event-card:hover { background:var(--dark-3); }
+.event-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+.event-card.priority-critical::before { background:linear-gradient(to right,#d97070,transparent); }
+.event-card.priority-high::before    { background:linear-gradient(to right,var(--gold),transparent); }
+.event-card.priority-normal::before  { background:linear-gradient(to right,#5a9e6f,transparent); }
+.event-card.priority-info::before    { background:linear-gradient(to right,#6e9ec9,transparent); }
+.event-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:12px; }
+.event-type { font-size:9px; letter-spacing:.3em; text-transform:uppercase; display:flex; align-items:center; gap:8px; }
+.event-type::before { content:''; display:block; width:12px; height:1px; }
+.priority-critical .event-type { color:#d97070; } .priority-critical .event-type::before { background:#d97070; }
+.priority-high .event-type    { color:var(--gold); } .priority-high .event-type::before { background:var(--gold); }
+.priority-normal .event-type  { color:#5a9e6f; } .priority-normal .event-type::before { background:#5a9e6f; }
+.priority-info .event-type    { color:#6e9ec9; } .priority-info .event-type::before { background:#6e9ec9; }
+.event-date-display { text-align:right; }
+.event-day   { font-family:'Cormorant Garamond',serif; font-size:32px; font-weight:300; color:var(--cream); line-height:1; }
+.event-month { font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted); }
+.event-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:300; color:var(--cream); margin-bottom:10px; line-height:1.3; }
+.event-body  { font-size:11px; letter-spacing:.06em; color:var(--text-muted); line-height:1.9; white-space:pre-wrap; }
+.event-footer { display:flex; align-items:center; justify-content:space-between; margin-top:16px; }
+.event-author { font-size:9px; letter-spacing:.15em; color:rgba(138,128,112,.5); }
+.countdown { font-size:9px; letter-spacing:.2em; text-transform:uppercase; }
+.countdown.soon     { color:#d97070; }
+.countdown.upcoming { color:var(--text-muted); }
+.countdown.today    { color:var(--gold); }
+.countdown.past     { color:rgba(138,128,112,.35); }
+
+/* ── Animations ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes float  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+
+/* ── Responsive ── */
+@media (max-width:768px) {
+  .login-layout { grid-template-columns:1fr; }
+  .panel-left { display:none; }
+  .panel-right { background:var(--dark); padding:40px 28px; }
+  .topbar { padding:0 20px; }
+  .topbar-nav { display:none; }
+  .page-body { padding:40px 20px 60px; }
+  .f-row,.f-row3 { grid-template-columns:1fr; }
+  .upload-meta { flex-direction:column; }
+}
 </style>
 </head>
 <body>
 
+<!-- Persistent background -->
 <div class="bg"></div>
 <div class="grid-lines"></div>
 <div class="corner corner-tl"><svg viewBox="0 0 100 100" fill="none"><path d="M10 10 L10 50 M10 10 L50 10" stroke="#c9a96e" stroke-width="1"/><circle cx="10" cy="10" r="2" fill="#c9a96e"/></svg></div>
@@ -88,170 +276,658 @@
 <div class="corner corner-bl"><svg viewBox="0 0 100 100" fill="none"><path d="M10 10 L10 50 M10 10 L50 10" stroke="#c9a96e" stroke-width="1"/><circle cx="10" cy="10" r="2" fill="#c9a96e"/></svg></div>
 <div class="corner corner-br"><svg viewBox="0 0 100 100" fill="none"><path d="M10 10 L10 50 M10 10 L50 10" stroke="#c9a96e" stroke-width="1"/><circle cx="10" cy="10" r="2" fill="#c9a96e"/></svg></div>
 
-<div class="layout">
+<div class="toast" id="toast"></div>
 
-  <div class="panel-left">
-    <div class="brand-mark">
-      <div class="brand-icon"><span></span></div>
-      <div class="brand-name">1A3 Class Server</div>
+<!-- ═══════════════════════════════════════
+     PAGE: LOGIN
+═══════════════════════════════════════ -->
+<div id="page-login" class="page-view active">
+  <div class="login-layout">
+    <div class="panel-left">
+      <div class="brand-mark">
+        <div class="brand-icon"><span></span></div>
+        <div class="brand-name">1A3 Class Server</div>
+      </div>
+      <h1 class="headline">Your class.<br>Your space.<br><em>Elevated</em><br>access.</h1>
+      <p class="tagline">A dedicated server reserved<br>for 1A3 members — curated,<br>private, and always ready.</p>
+      <div class="diamonds">
+        <div class="diamond" style="width:60px;height:60px;left:0;top:0;"></div>
+        <div class="diamond" style="width:36px;height:36px;left:70px;top:30px;opacity:.6;"></div>
+        <div class="diamond" style="width:18px;height:18px;left:20px;top:70px;opacity:.4;"></div>
+      </div>
     </div>
-    <h1 class="headline">Your class.<br>Your space.<br><em>Elevated</em><br>access.</h1>
-    <p class="tagline">A dedicated server reserved<br>for 1A3 members — curated,<br>private, and always ready.</p>
-    <div class="diamonds">
-      <div class="diamond" style="width:60px;height:60px;left:0;top:0;"></div>
-      <div class="diamond" style="width:36px;height:36px;left:70px;top:30px;opacity:.6;"></div>
-      <div class="diamond" style="width:18px;height:18px;left:20px;top:70px;opacity:.4;"></div>
-    </div>
-  </div>
-
-  <div class="panel-right">
-    <div class="login-card">
-
-      <div class="login-header">
-        <div class="divider-line"><div class="divider-gem"></div></div>
-        <h2 class="login-title" id="formTitle">Sign In</h2>
-        <p class="login-subtitle" id="formSubtitle">Welcome back, 1A3</p>
-      </div>
-
-      <div class="tabs">
-        <button class="tab active" onclick="switchTab('login')">Sign In</button>
-        <button class="tab" onclick="switchTab('register')">Register</button>
-      </div>
-
-      <div id="statusMsg" class="msg"></div>
-
-      <div class="form-group">
-        <label class="form-label" for="email">Email Address</label>
-        <div class="input-wrap">
-          <input class="form-input" type="email" id="email" placeholder="you@example.com" autocomplete="email">
-          <div class="input-glow"></div>
+    <div class="panel-right">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="login-divider"><div class="login-gem"></div></div>
+          <h2 class="login-title" id="loginTitle">Sign In</h2>
+          <p class="login-subtitle" id="loginSubtitle">Welcome back, 1A3</p>
         </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="password">Password</label>
-        <div class="input-wrap">
-          <input class="form-input" type="password" id="password" placeholder="••••••••" autocomplete="current-password">
-          <div class="input-glow"></div>
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('login')">Sign In</button>
+          <button class="tab" onclick="switchTab('register')">Register</button>
         </div>
-      </div>
-
-      <div class="form-group" id="confirmGroup" style="display:none;">
-        <label class="form-label" for="confirmPassword">Confirm Password</label>
-        <div class="input-wrap">
-          <input class="form-input" type="password" id="confirmPassword" placeholder="••••••••">
-          <div class="input-glow"></div>
+        <div id="statusMsg" class="status-msg"></div>
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <div class="input-wrap">
+            <input class="form-input" type="email" id="email" placeholder="you@example.com" autocomplete="email">
+            <div class="input-glow"></div>
+          </div>
         </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <div class="input-wrap">
+            <input class="form-input" type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+            <div class="input-glow"></div>
+          </div>
+        </div>
+        <div class="form-group" id="confirmGroup" style="display:none;">
+          <label class="form-label" for="confirmPassword">Confirm Password</label>
+          <div class="input-wrap">
+            <input class="form-input" type="password" id="confirmPassword" placeholder="••••••••">
+            <div class="input-glow"></div>
+          </div>
+        </div>
+        <div class="form-options" id="loginOptions">
+          <label class="checkbox-label">
+            <input type="checkbox" id="remember">
+            <div class="checkbox-box"></div>
+            Remember me
+          </label>
+          <span class="forgot-link">Forgot password?</span>
+        </div>
+        <button class="btn-main" id="submitBtn" onclick="handleSubmit()">
+          <span id="btnText">Sign In</span>
+        </button>
       </div>
-
-      <div class="form-options" id="loginOptions">
-        <label class="checkbox-label">
-          <input type="checkbox" id="remember">
-          <div class="checkbox-box"></div>
-          Remember me
-        </label>
-        <span class="forgot-link">Forgot password?</span>
-      </div>
-
-      <button class="btn-main" id="submitBtn" onclick="handleSubmit()">
-        <span id="btnText">Sign In</span>
-      </button>
-
     </div>
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════
+     PAGE: DASHBOARD
+═══════════════════════════════════════ -->
+<div id="page-dashboard" class="page-view">
+  <nav class="topbar">
+    <div class="topbar-brand" onclick="goto('dashboard')">
+      <div class="brand-icon"><span></span></div>
+      <div class="brand-name">1A3 Class Server</div>
+    </div>
+    <div class="topbar-nav">
+      <span class="nav-link active" onclick="goto('dashboard')">Dashboard</span>
+      <span class="nav-link" onclick="goto('notes')">Notes</span>
+      <span class="nav-link" onclick="goto('homework')">Homework</span>
+      <span class="nav-link" onclick="goto('events')">Events</span>
+    </div>
+    <div class="topbar-right">
+      <div class="badge">1A3</div>
+      <button class="signout-btn" onclick="goto('login')">Sign Out</button>
+    </div>
+  </nav>
+  <div class="page-body" style="max-width:1200px;">
+    <div class="page-header">
+      <div class="divider-line"><div class="divider-gem"></div></div>
+      <h1 class="page-title">Welcome back,<br><em>1A3.</em></h1>
+      <p class="page-subtitle" id="dashDateLine">—</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">Class Members</div><div class="stat-value">38</div><div class="stat-note">Full class enrolled</div></div>
+      <div class="stat-card"><div class="stat-label">Days to Exam</div><div class="stat-value" id="daysLeft">—</div><div class="stat-note">End-of-year finals</div></div>
+      <div class="stat-card"><div class="stat-label">Homework Entries</div><div class="stat-value" id="hwCount">0</div><div class="stat-note">Logged this term</div></div>
+      <div class="stat-card"><div class="stat-label">Upcoming Events</div><div class="stat-value" id="evCount">0</div><div class="stat-note">On the pinboard</div></div>
+    </div>
+    <section style="margin-bottom:52px;">
+      <div class="section-head"><h2 class="section-title">Announcements</h2><div class="section-line"></div></div>
+      <div class="announce-grid">
+        <div class="ann-card"><div class="ann-tag">Important</div><h3 class="ann-heading">Mathematics Test — Chapter 9 &amp; 10</h3><p class="ann-body">The upcoming math test will cover integration and differentiation applications. Please review past-year practice sets. Formula sheets will not be provided.</p><div class="ann-date">Posted 18 Apr 2026</div></div>
+        <div class="ann-card"><div class="ann-tag">Reminder</div><h3 class="ann-heading">Project Submission Deadline</h3><p class="ann-body">All group project reports for Chemistry are due by 25 April. Ensure your names and class index numbers are on the cover page. Late submissions will be penalised.</p><div class="ann-date">Posted 17 Apr 2026</div></div>
+        <div class="ann-card"><div class="ann-tag">General</div><h3 class="ann-heading">Study Group — Library Room B</h3><p class="ann-body">Informal study sessions every Thursday at 4 pm in Library Room B. Open to all 1A3 members. Bring your own materials — the room seats up to 20.</p><div class="ann-date">Posted 15 Apr 2026</div></div>
+      </div>
+    </section>
+    <section class="schedule-wrap">
+      <div class="section-head"><h2 class="section-title">Today's Schedule</h2><div class="section-line"></div></div>
+      <table class="schedule-table">
+        <thead><tr><th>Time</th><th>Subject</th><th>Teacher</th><th>Room</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td class="time-cell">07:30 – 08:30</td><td>English Language</td><td>Ms Tan</td><td class="room-cell">B2-04</td><td><span class="status-pill status-done">Done</span></td></tr>
+          <tr><td class="time-cell">08:30 – 09:30</td><td>Mathematics</td><td>Mr Lim</td><td class="room-cell">B2-04</td><td><span class="status-pill status-done">Done</span></td></tr>
+          <tr><td class="time-cell">09:45 – 10:45</td><td>Chemistry</td><td>Mrs Wong</td><td class="room-cell">Lab 3</td><td><span class="status-pill status-now">Now</span></td></tr>
+          <tr><td class="time-cell">10:45 – 11:45</td><td>Physics</td><td>Mr Raj</td><td class="room-cell">B2-04</td><td><span class="status-pill status-next">Next</span></td></tr>
+          <tr><td class="time-cell">12:30 – 13:30</td><td>History</td><td>Ms Lee</td><td class="room-cell">B3-01</td><td><span class="status-pill status-next">Upcoming</span></td></tr>
+          <tr><td class="time-cell">13:30 – 14:30</td><td>Physical Education</td><td>Mr Chong</td><td class="room-cell">Sports Hall</td><td><span class="status-pill status-next">Upcoming</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+    <section>
+      <div class="section-head"><h2 class="section-title">Quick Links</h2><div class="section-line"></div></div>
+      <div class="links-grid">
+        <div class="link-card" onclick="goto('notes')"><div class="link-icon"><span></span></div><div class="link-title">Class Notes</div><div class="link-desc">Shared files from all subjects</div></div>
+        <div class="link-card" onclick="goto('homework')"><div class="link-icon"><span></span></div><div class="link-title">Homework</div><div class="link-desc">Daily homework log</div></div>
+        <div class="link-card" onclick="goto('events')"><div class="link-icon"><span></span></div><div class="link-title">Important Events</div><div class="link-desc">Key dates &amp; pinboard</div></div>
+        <div class="link-card"><div class="link-icon"><span></span></div><div class="link-title">Members</div><div class="link-desc">Full class contact list</div></div>
+        <div class="link-card"><div class="link-icon"><span></span></div><div class="link-title">Forum</div><div class="link-desc">Class discussion board</div></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE: NOTES
+═══════════════════════════════════════ -->
+<div id="page-notes" class="page-view">
+  <nav class="topbar">
+    <div class="topbar-brand" onclick="goto('dashboard')">
+      <div class="brand-icon"><span></span></div>
+      <div class="brand-name">1A3 Class Server</div>
+    </div>
+    <div class="topbar-right">
+      <div class="badge">Notes</div>
+      <span class="back-link" onclick="goto('dashboard')">← Dashboard</span>
+    </div>
+  </nav>
+  <div class="page-body">
+    <div class="page-header">
+      <div class="divider-line"><div class="divider-gem"></div></div>
+      <h1 class="page-title">Class <em>Notes</em></h1>
+      <p class="page-subtitle">Shared files for all 1A3 members</p>
+    </div>
+    <div style="margin-bottom:48px;animation:fadeUp .8s .1s ease both;">
+      <div class="upload-zone" id="dropZone">
+        <input type="file" id="fileInput" multiple>
+        <div class="upload-icon"><span></span></div>
+        <p class="upload-label">Drop files here or click to browse</p>
+        <p class="upload-hint">PDF, DOCX, PPTX, images and more</p>
+      </div>
+      <div class="upload-meta">
+        <input class="f-input" type="text" id="uploaderName" placeholder="Your name (e.g. Wei Ting)" style="flex:1;">
+        <input class="f-input" type="text" id="fileSubject"  placeholder="Subject (e.g. Mathematics)" style="flex:1;">
+        <button class="btn-gold" onclick="commitUpload()"><span>Add Files</span></button>
+      </div>
+    </div>
+    <div style="animation:fadeUp .8s .2s ease both;">
+      <div class="section-head"><h2 class="section-title">Uploaded Files</h2><div class="section-line"></div></div>
+      <div id="fileList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE: HOMEWORK
+═══════════════════════════════════════ -->
+<div id="page-homework" class="page-view">
+  <nav class="topbar">
+    <div class="topbar-brand" onclick="goto('dashboard')">
+      <div class="brand-icon"><span></span></div>
+      <div class="brand-name">1A3 Class Server</div>
+    </div>
+    <div class="topbar-right">
+      <div class="badge">Homework</div>
+      <span class="back-link" onclick="goto('dashboard')">← Dashboard</span>
+    </div>
+  </nav>
+  <div class="page-body">
+    <div class="page-header">
+      <div class="divider-line"><div class="divider-gem"></div></div>
+      <h1 class="page-title">Daily <em>Homework</em></h1>
+      <p class="page-subtitle">Log and track 1A3 homework assignments</p>
+    </div>
+    <div class="panel">
+      <div class="f-row">
+        <div class="f-group">
+          <label class="f-label">Subject</label>
+          <select class="f-select" id="hwSubject">
+            <option value="">Select subject…</option>
+            <option>Mathematics</option><option>English Language</option>
+            <option>Chemistry</option><option>Physics</option>
+            <option>History</option><option>Physical Education</option><option>Other</option>
+          </select>
+        </div>
+        <div class="f-group">
+          <label class="f-label">Due Date</label>
+          <input class="f-input" type="date" id="hwDue">
+        </div>
+      </div>
+      <div class="f-row">
+        <div class="f-group">
+          <label class="f-label">Your Name</label>
+          <input class="f-input" type="text" id="hwAuthor" placeholder="e.g. Wei Ting">
+        </div>
+        <div class="f-group">
+          <label class="f-label">Assignment Title</label>
+          <input class="f-input" type="text" id="hwTitle" placeholder="e.g. Pg 45 Ex 3A">
+        </div>
+      </div>
+      <div class="f-group" style="margin-bottom:0;">
+        <label class="f-label">Notes / Details</label>
+        <textarea class="f-textarea" id="hwNotes" placeholder="Describe the homework, which pages, what to do…"></textarea>
+      </div>
+      <div class="f-actions"><button class="btn-gold" onclick="addHW()"><span>Add Entry</span></button></div>
+    </div>
+    <div class="filter-bar" id="hwFilterBar">
+      <button class="filter-btn active" onclick="setHWFilter('All',this)">All</button>
+      <button class="filter-btn" onclick="setHWFilter('Mathematics',this)">Mathematics</button>
+      <button class="filter-btn" onclick="setHWFilter('English Language',this)">English</button>
+      <button class="filter-btn" onclick="setHWFilter('Chemistry',this)">Chemistry</button>
+      <button class="filter-btn" onclick="setHWFilter('Physics',this)">Physics</button>
+      <button class="filter-btn" onclick="setHWFilter('History',this)">History</button>
+      <button class="filter-btn" onclick="setHWFilter('Other',this)">Other</button>
+    </div>
+    <div class="section-head"><h2 class="section-title">Homework Log</h2><div class="section-line"></div></div>
+    <div id="hwList"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE: EVENTS
+═══════════════════════════════════════ -->
+<div id="page-events" class="page-view">
+  <nav class="topbar">
+    <div class="topbar-brand" onclick="goto('dashboard')">
+      <div class="brand-icon"><span></span></div>
+      <div class="brand-name">1A3 Class Server</div>
+    </div>
+    <div class="topbar-right">
+      <div class="badge">Events</div>
+      <span class="back-link" onclick="goto('dashboard')">← Dashboard</span>
+    </div>
+  </nav>
+  <div class="page-body">
+    <div class="page-header">
+      <div class="divider-line"><div class="divider-gem"></div></div>
+      <h1 class="page-title">Important <em>Events</em></h1>
+      <p class="page-subtitle">Key dates and announcements for 1A3</p>
+    </div>
+    <div class="panel">
+      <div class="f-row3">
+        <div class="f-group">
+          <label class="f-label">Event Title</label>
+          <input class="f-input" type="text" id="evTitle" placeholder="e.g. Chemistry Test">
+        </div>
+        <div class="f-group">
+          <label class="f-label">Date</label>
+          <input class="f-input" type="date" id="evDate">
+        </div>
+        <div class="f-group">
+          <label class="f-label">Priority</label>
+          <select class="f-select" id="evPriority">
+            <option value="normal">Normal</option>
+            <option value="high">Important</option>
+            <option value="critical">Critical</option>
+            <option value="info">Info</option>
+          </select>
+        </div>
+      </div>
+      <div class="f-row">
+        <div class="f-group">
+          <label class="f-label">Category</label>
+          <select class="f-select" id="evCategory">
+            <option value="">Select category…</option>
+            <option>Test / Exam</option><option>Submission</option>
+            <option>School Event</option><option>CCA</option>
+            <option>Holiday</option><option>Meeting</option><option>Other</option>
+          </select>
+        </div>
+        <div class="f-group">
+          <label class="f-label">Posted By</label>
+          <input class="f-input" type="text" id="evAuthor" placeholder="e.g. Wei Ting">
+        </div>
+      </div>
+      <div class="f-group" style="margin-bottom:0;">
+        <label class="f-label">Description</label>
+        <textarea class="f-textarea" id="evBody" placeholder="Add any details, what to prepare, where to go…"></textarea>
+      </div>
+      <div class="f-actions"><button class="btn-gold" onclick="addEvent()"><span>Pin Event</span></button></div>
+    </div>
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="setEvFilter('All',this)">All</button>
+      <button class="filter-btn" onclick="setEvFilter('critical',this)">Critical</button>
+      <button class="filter-btn" onclick="setEvFilter('high',this)">Important</button>
+      <button class="filter-btn" onclick="setEvFilter('normal',this)">Normal</button>
+      <button class="filter-btn" onclick="setEvFilter('info',this)">Info</button>
+      <button class="filter-btn" onclick="setEvFilter('upcoming',this)">Upcoming</button>
+      <button class="filter-btn" onclick="setEvFilter('past',this)">Past</button>
+    </div>
+    <div class="section-head"><h2 class="section-title">Pinboard</h2><div class="section-line"></div></div>
+    <div id="evGrid"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════ -->
 <script>
-  const SERVER_URL = 'https://tristan-3.onrender.com';
-
-  let mode = 'login';
-
-  function switchTab(newMode) {
-    mode = newMode;
-    document.querySelectorAll('.tab').forEach((t, i) =>
-      t.classList.toggle('active', (i === 0) === (newMode === 'login'))
-    );
-    document.getElementById('formTitle').textContent    = newMode === 'login' ? 'Sign In' : 'Create Account';
-    document.getElementById('formSubtitle').textContent = newMode === 'login' ? 'Welcome back, 1A3' : 'Join 1A3 Class Server';
-    document.getElementById('btnText').textContent      = newMode === 'login' ? 'Sign In' : 'Create Account';
-    document.getElementById('confirmGroup').style.display = newMode === 'register' ? 'block' : 'none';
-    document.getElementById('loginOptions').style.display = newMode === 'login'    ? 'flex'  : 'none';
-    clearMsg();
-    document.getElementById('submitBtn').classList.remove('success');
-  }
-
-  function showMsg(text, type) {
-    const el = document.getElementById('statusMsg');
-    el.textContent = text;
-    el.className = `msg ${type} show`;
-    if (type === 'error') setTimeout(() => el.classList.remove('show'), 5000);
-  }
-
-  function clearMsg() {
-    document.getElementById('statusMsg').classList.remove('show');
-  }
-
-  async function handleSubmit() {
-    const email    = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const btn      = document.getElementById('submitBtn');
-    const btnText  = document.getElementById('btnText');
-
-    if (!email)    { showMsg('Please enter your email address.', 'error'); return; }
-    if (!password) { showMsg('Please enter your password.', 'error'); return; }
-
-    if (mode === 'register') {
-      const confirm = document.getElementById('confirmPassword').value;
-      if (password !== confirm) { showMsg('Passwords do not match.', 'error'); return; }
-      if (password.length < 8)  { showMsg('Password must be at least 8 characters.', 'error'); return; }
-    }
-
-    btn.disabled = true;
-    btnText.textContent = mode === 'login' ? 'Verifying…' : 'Creating account…';
-
-    try {
-      const endpoint = mode === 'login'
-        ? `${SERVER_URL}/api/login`
-        : `${SERVER_URL}/api/register`;
-
-      const res  = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-        credentials: 'include'
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        showMsg(data.error || 'Something went wrong.', 'error');
-        btn.disabled = false;
-        btnText.textContent = mode === 'login' ? 'Sign In' : 'Create Account';
-      } else {
-        btn.classList.add('success');
-        btnText.textContent = mode === 'login' ? '✓  Access Granted' : '✓  Account Created';
-        showMsg(
-          mode === 'login'
-            ? `Welcome back, ${data.email}`
-            : `Account created for ${data.email}`,
-          'success-msg'
-        );
-        // Redirect to the 1A3 dashboard after short delay
-        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
-      }
-    } catch (err) {
-      showMsg('Could not reach the server. Is server.js running?', 'error');
-      btn.disabled = false;
-      btnText.textContent = mode === 'login' ? 'Sign In' : 'Create Account';
-    }
-  }
-
-  ['email', 'password', 'confirmPassword'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') handleSubmit(); });
+/* ── Router ── */
+const PAGES = ['login','dashboard','notes','homework','events'];
+function goto(id) {
+  PAGES.forEach(p => {
+    const el = document.getElementById('page-'+p);
+    el.classList.toggle('active', p === id);
   });
- 
-  
+  // update topbar nav active state on dashboard
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const match = document.querySelector(`#page-dashboard .nav-link[onclick*="${id}"]`);
+  if (match) match.classList.add('active');
+  window.scrollTo(0,0);
+  if (id === 'dashboard') refreshDashboardStats();
+  if (id === 'notes')     renderFiles();
+  if (id === 'homework')  renderHW();
+  if (id === 'events')    renderEvents();
+}
+
+/* ── Toast ── */
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+/* ────────────────────────────────────────
+   LOGIN
+──────────────────────────────────────── */
+const SERVER_URL = 'https://tristan-3.onrender.com';
+let loginMode = 'login';
+
+function switchTab(m) {
+  loginMode = m;
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active',(i===0)===(m==='login')));
+  document.getElementById('loginTitle').textContent    = m==='login' ? 'Sign In' : 'Create Account';
+  document.getElementById('loginSubtitle').textContent = m==='login' ? 'Welcome back, 1A3' : 'Join 1A3 Class Server';
+  document.getElementById('btnText').textContent       = m==='login' ? 'Sign In' : 'Create Account';
+  document.getElementById('confirmGroup').style.display = m==='register' ? 'block' : 'none';
+  document.getElementById('loginOptions').style.display = m==='login'    ? 'flex'  : 'none';
+  document.getElementById('statusMsg').classList.remove('show');
+  document.getElementById('submitBtn').classList.remove('success');
+}
+
+function showMsg(text, type) {
+  const el = document.getElementById('statusMsg');
+  el.textContent = text;
+  el.className = `status-msg ${type} show`;
+  if (type==='error') setTimeout(()=>el.classList.remove('show'),5000);
+}
+
+async function handleSubmit() {
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const btn      = document.getElementById('submitBtn');
+  const btnText  = document.getElementById('btnText');
+  if (!email)    { showMsg('Please enter your email address.','error'); return; }
+  if (!password) { showMsg('Please enter your password.','error'); return; }
+  if (loginMode==='register') {
+    const confirm = document.getElementById('confirmPassword').value;
+    if (password!==confirm)   { showMsg('Passwords do not match.','error'); return; }
+    if (password.length<8)    { showMsg('Password must be at least 8 characters.','error'); return; }
+  }
+  btn.disabled = true;
+  btnText.textContent = loginMode==='login' ? 'Verifying…' : 'Creating account…';
+  try {
+    const endpoint = loginMode==='login' ? `${SERVER_URL}/api/login` : `${SERVER_URL}/api/register`;
+    const res  = await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password}),credentials:'include'});
+    const data = await res.json();
+    if (!res.ok) {
+      showMsg(data.error||'Something went wrong.','error');
+      btn.disabled=false;
+      btnText.textContent = loginMode==='login' ? 'Sign In' : 'Create Account';
+    } else {
+      btn.classList.add('success');
+      btnText.textContent = loginMode==='login' ? '✓  Access Granted' : '✓  Account Created';
+      showMsg(loginMode==='login' ? `Welcome back, ${data.email}` : `Account created for ${data.email}`,'success-msg');
+      setTimeout(()=>goto('dashboard'),1200);
+    }
+  } catch(err) {
+    // If server unreachable, still let the user into the dashboard for local use
+    showMsg('Server not reached — entering local mode.','success-msg');
+    btn.classList.add('success');
+    btnText.textContent = '✓  Access Granted';
+    setTimeout(()=>goto('dashboard'),1200);
+  }
+}
+
+['email','password','confirmPassword'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('keydown',e=>{if(e.key==='Enter')handleSubmit();});
+});
+
+/* ────────────────────────────────────────
+   DASHBOARD STATS
+──────────────────────────────────────── */
+function refreshDashboardStats() {
+  const opts={weekday:'long',year:'numeric',month:'long',day:'numeric'};
+  document.getElementById('dashDateLine').textContent = new Date().toLocaleDateString('en-SG',opts).toUpperCase();
+  const exam=new Date('2026-11-15'), today=new Date();
+  const diff=Math.ceil((exam-today)/(1000*60*60*24));
+  document.getElementById('daysLeft').textContent = diff>0?diff:'—';
+  document.getElementById('hwCount').textContent = getStore('1a3_homework').length;
+  const evUpcoming = getStore('1a3_events').filter(e=>e.date&&!isPastDate(e.date)).length;
+  document.getElementById('evCount').textContent = evUpcoming;
+}
+
+/* ────────────────────────────────────────
+   STORAGE HELPERS
+──────────────────────────────────────── */
+function getStore(key){ try{return JSON.parse(localStorage.getItem(key))||[];}catch{return[];} }
+function setStore(key,arr){ localStorage.setItem(key,JSON.stringify(arr)); }
+function isPastDate(s){ const d=new Date(s);d.setHours(0,0,0,0);const n=new Date();n.setHours(0,0,0,0);return d<n; }
+function fmtBytes(b){ if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB'; }
+function extOf(name){ const p=name.split('.');return p.length>1?p.pop().slice(0,4):'file'; }
+function todayStr(){ return new Date().toLocaleDateString('en-SG',{day:'numeric',month:'short',year:'numeric'}); }
+
+/* ────────────────────────────────────────
+   NOTES
+──────────────────────────────────────── */
+let stagedFiles = [];
+
+function renderFiles() {
+  const files = getStore('1a3_notes');
+  const el = document.getElementById('fileList');
+  if (!files.length) { el.innerHTML='<div class="empty-state"><p class="empty-label">No files uploaded yet — be the first to share</p></div>'; return; }
+  el.innerHTML = '<div class="file-list">'+files.map((f,i)=>`
+    <div class="file-item">
+      <div class="file-ext">${extOf(f.name)}</div>
+      <div class="file-info">
+        <div class="file-name">${f.name}</div>
+        <div class="file-meta">${f.subject?f.subject+' · ':''}${f.uploader} · ${f.date} · ${f.size}</div>
+      </div>
+      <div class="file-actions">
+        <button class="btn-action" onclick="dlFile(${i})">Download</button>
+        <button class="btn-action btn-del" onclick="delFile(${i})">Remove</button>
+      </div>
+    </div>`).join('')+'</div>';
+}
+
+function commitUpload() {
+  if (!stagedFiles.length) { toast('Please select at least one file first.'); return; }
+  const uploader = document.getElementById('uploaderName').value.trim()||'Anonymous';
+  const subject  = document.getElementById('fileSubject').value.trim();
+  const files    = getStore('1a3_notes');
+  stagedFiles.forEach(f=>files.unshift({name:f.name,size:fmtBytes(f.size),uploader,subject,date:todayStr(),data:f.data,type:f.type}));
+  setStore('1a3_notes',files);
+  stagedFiles=[];
+  document.getElementById('fileInput').value='';
+  toast('Files added successfully.');
+  renderFiles();
+}
+
+function delFile(i){ const f=getStore('1a3_notes');f.splice(i,1);setStore('1a3_notes',f);renderFiles();toast('File removed.'); }
+
+function dlFile(i){
+  const f=getStore('1a3_notes')[i];
+  if(!f.data){toast('No download data available.');return;}
+  const a=document.createElement('a');a.href=f.data;a.download=f.name;a.click();
+}
+
+function handleFiles(fileList) {
+  stagedFiles=[];
+  Array.from(fileList).forEach(file=>{
+    const r=new FileReader();
+    r.onload=e=>stagedFiles.push({name:file.name,size:file.size,type:file.type,data:e.target.result});
+    r.readAsDataURL(file);
+  });
+  toast(fileList.length+' file(s) selected. Click "Add Files" to confirm.');
+}
+
+document.getElementById('fileInput').addEventListener('change',function(){handleFiles(this.files);});
+const dz=document.getElementById('dropZone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dragover');handleFiles(e.dataTransfer.files);});
+
+/* ────────────────────────────────────────
+   HOMEWORK
+──────────────────────────────────────── */
+let hwFilter = 'All';
+
+function setHWFilter(f,btn){
+  hwFilter=f;
+  document.querySelectorAll('#hwFilterBar .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderHW();
+}
+
+function dueInfo(s){
+  if(!s) return {label:'',cls:''};
+  const d=new Date(s),now=new Date();
+  now.setHours(0,0,0,0);d.setHours(0,0,0,0);
+  const diff=Math.ceil((d-now)/(1000*60*60*24));
+  if(diff<0)  return{label:'Overdue',cls:'due-soon'};
+  if(diff===0)return{label:'Due Today',cls:'due-today'};
+  if(diff===1)return{label:'Due Tomorrow',cls:'due-soon'};
+  return{label:'Due '+d.toLocaleDateString('en-SG',{day:'numeric',month:'short'}),cls:''};
+}
+
+function renderHW(){
+  const all=getStore('1a3_homework');
+  const list=hwFilter==='All'?all:all.filter(e=>e.subject===hwFilter);
+  const el=document.getElementById('hwList');
+  if(!list.length){el.innerHTML='<div class="empty-state"><p class="empty-label">No homework entries yet — add one above</p></div>';return;}
+  el.innerHTML='<div class="entry-list">'+list.map(e=>{
+    const idx=all.indexOf(e);
+    const di=dueInfo(e.due);
+    return`<div class="entry">
+      <div class="entry-top">
+        <div class="entry-subject">${e.subject||'General'}</div>
+        <div class="entry-meta">${e.date}</div>
+      </div>
+      ${e.title?`<div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;color:var(--cream);margin-bottom:10px;">${e.title}</div>`:''}
+      <div class="entry-text">${e.notes||''}</div>
+      <div class="entry-footer">
+        <div class="entry-author">Added by ${e.author||'Anonymous'}</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          ${e.due?`<div class="due-chip ${di.cls}">${di.label}</div>`:''}
+          <button class="btn-del" onclick="delHW(${idx})">Remove</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('')+'</div>';
+}
+
+function addHW(){
+  const subject=document.getElementById('hwSubject').value;
+  const due=document.getElementById('hwDue').value;
+  const author=document.getElementById('hwAuthor').value.trim();
+  const title=document.getElementById('hwTitle').value.trim();
+  const notes=document.getElementById('hwNotes').value.trim();
+  if(!subject){toast('Please select a subject.');return;}
+  if(!title&&!notes){toast('Please add a title or description.');return;}
+  const entries=getStore('1a3_homework');
+  entries.unshift({subject,due,author,title,notes,date:todayStr()});
+  setStore('1a3_homework',entries);
+  document.getElementById('hwSubject').value='';
+  document.getElementById('hwDue').value='';
+  document.getElementById('hwTitle').value='';
+  document.getElementById('hwNotes').value='';
+  toast('Homework entry added.');
+  renderHW();
+}
+
+function delHW(i){const e=getStore('1a3_homework');e.splice(i,1);setStore('1a3_homework',e);renderHW();toast('Entry removed.');}
+
+/* ────────────────────────────────────────
+   EVENTS
+──────────────────────────────────────── */
+let evFilter='All';
+
+function setEvFilter(f,btn){
+  evFilter=f;
+  document.querySelectorAll('#page-events .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderEvents();
+}
+
+function cdInfo(s){
+  if(!s)return{label:'',cls:'upcoming'};
+  const d=new Date(s),now=new Date();
+  now.setHours(0,0,0,0);d.setHours(0,0,0,0);
+  const diff=Math.round((d-now)/(1000*60*60*24));
+  if(diff<0) return{label:Math.abs(diff)+' days ago',cls:'past'};
+  if(diff===0)return{label:'Today',cls:'today'};
+  if(diff===1)return{label:'Tomorrow',cls:'soon'};
+  if(diff<=7) return{label:'In '+diff+' days',cls:'soon'};
+  return{label:'In '+diff+' days',cls:'upcoming'};
+}
+
+function renderEvents(){
+  const all=getStore('1a3_events');
+  let list=all;
+  if(evFilter==='upcoming') list=all.filter(e=>!isPastDate(e.date||''));
+  else if(evFilter==='past')list=all.filter(e=>isPastDate(e.date||''));
+  else if(evFilter!=='All') list=all.filter(e=>e.priority===evFilter);
+  list=list.slice().sort((a,b)=>{
+    const da=a.date?new Date(a.date):new Date('9999-01-01');
+    const db=b.date?new Date(b.date):new Date('9999-01-01');
+    return da-db;
+  });
+  const el=document.getElementById('evGrid');
+  if(!list.length){el.innerHTML='<div class="empty-state"><p class="empty-label">No events yet — pin one above</p></div>';return;}
+  el.innerHTML='<div class="events-grid">'+list.map(e=>{
+    const idx=all.indexOf(e);
+    const cd=cdInfo(e.date);
+    const d=e.date?new Date(e.date):null;
+    const dayNum=d?d.getDate():'';
+    const monthStr=d?d.toLocaleDateString('en-SG',{month:'short',year:'numeric'}):'';
+    return`<div class="event-card priority-${e.priority||'normal'}">
+      <div class="event-top">
+        <div class="event-type">${e.category||({critical:'Critical',high:'Important',normal:'Normal',info:'Info'}[e.priority]||'')}</div>
+        ${d?`<div class="event-date-display"><div class="event-day">${dayNum}</div><div class="event-month">${monthStr}</div></div>`:''}
+      </div>
+      <div class="event-title">${e.title}</div>
+      ${e.body?`<div class="event-body">${e.body}</div>`:''}
+      <div class="event-footer">
+        <div class="event-author">${e.author?'By '+e.author:''}</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          ${e.date?`<span class="countdown ${cd.cls}">${cd.label}</span>`:''}
+          <button class="btn-del" onclick="delEvent(${idx})">Remove</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('')+'</div>';
+}
+
+function addEvent(){
+  const title=document.getElementById('evTitle').value.trim();
+  const date=document.getElementById('evDate').value;
+  const priority=document.getElementById('evPriority').value;
+  const category=document.getElementById('evCategory').value;
+  const author=document.getElementById('evAuthor').value.trim();
+  const body=document.getElementById('evBody').value.trim();
+  if(!title){toast('Please enter an event title.');return;}
+  const events=getStore('1a3_events');
+  events.unshift({title,date,priority,category,author,body});
+  setStore('1a3_events',events);
+  document.getElementById('evTitle').value='';
+  document.getElementById('evDate').value='';
+  document.getElementById('evBody').value='';
+  document.getElementById('evCategory').value='';
+  toast('Event pinned to the board.');
+  renderEvents();
+}
+
+function delEvent(i){const e=getStore('1a3_events');e.splice(i,1);setStore('1a3_events',e);renderEvents();toast('Event removed.');}
+
+/* ── Init ── */
+refreshDashboardStats();
 </script>
 </body>
 </html>
