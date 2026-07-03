@@ -73,10 +73,16 @@
   .btn-main span { position: relative; z-index: 1; }
   .btn-main.success { border-color: #5a9e6f; color: #5a9e6f; }
   .btn-main.success::before { background: rgba(90,158,111,.1); transform: scaleX(1); }
+  .btn-secondary { width: 100%; background: none; border: none; color: var(--text-muted); font-family: 'Josefin Sans', sans-serif; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; padding: 8px; cursor: pointer; text-align: center; transition: color .3s; }
+  .btn-secondary:hover { color: var(--gold); }
   .msg { font-size: 11px; letter-spacing: .1em; text-align: center; margin-bottom: 16px; padding: 10px; opacity: 0; transform: translateY(-4px); transition: opacity .3s, transform .3s; }
   .msg.show { opacity: 1; transform: translateY(0); }
   .msg.error { color: #d97070; border: 1px solid rgba(217,112,112,.2); }
   .msg.success-msg { color: #5a9e6f; border: 1px solid rgba(90,158,111,.2); }
+  .code-input { text-align: center; font-size: 22px !important; letter-spacing: .5em !important; padding-left: 10px !important; }
+  .code-hint { font-size: 10px; letter-spacing: .1em; color: var(--text-muted); text-align: center; margin-top: -10px; margin-bottom: 24px; line-height: 1.7; }
+  .step { display: none; }
+  .step.active { display: block; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
   @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .panel-left { display: none; } .panel-right { background: var(--dark); padding: 40px 28px; } }
@@ -107,61 +113,99 @@
 
   <div class="panel-right">
     <div class="login-card">
-      <div class="login-header">
-        <div class="divider-line"><div class="divider-gem"></div></div>
-        <h2 class="login-title" id="formTitle">Sign In</h2>
-        <p class="login-subtitle" id="formSubtitle">Welcome back</p>
-      </div>
 
-      <div class="tabs">
-        <button class="tab active" onclick="switchTab('login')">Sign In</button>
-        <button class="tab" onclick="switchTab('register')">Register</button>
-      </div>
-
-      <div id="statusMsg" class="msg"></div>
-
-      <div class="form-group">
-        <label class="form-label" for="email">Email Address</label>
-        <div class="input-wrap">
-          <input class="form-input" type="email" id="email" placeholder="you@example.com" autocomplete="email">
-          <div class="input-glow"></div>
+      <!-- STEP 1: Sign In / Register -->
+      <div class="step active" id="step1">
+        <div class="login-header">
+          <div class="divider-line"><div class="divider-gem"></div></div>
+          <h2 class="login-title" id="formTitle">Sign In</h2>
+          <p class="login-subtitle" id="formSubtitle">Welcome back</p>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label class="form-label" for="password">Password</label>
-        <div class="input-wrap">
-          <input class="form-input" type="password" id="password" placeholder="••••••••" autocomplete="current-password">
-          <div class="input-glow"></div>
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('login')">Sign In</button>
+          <button class="tab" onclick="switchTab('register')">Register</button>
         </div>
-      </div>
 
-      <div class="form-group" id="confirmGroup" style="display:none;">
-        <label class="form-label" for="confirmPassword">Confirm Password</label>
-        <div class="input-wrap">
-          <input class="form-input" type="password" id="confirmPassword" placeholder="••••••••">
-          <div class="input-glow"></div>
+        <div id="statusMsg" class="msg"></div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <div class="input-wrap">
+            <input class="form-input" type="email" id="email" placeholder="you@example.com" autocomplete="email">
+            <div class="input-glow"></div>
+          </div>
         </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <div class="input-wrap">
+            <input class="form-input" type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+            <div class="input-glow"></div>
+          </div>
+        </div>
+
+        <div class="form-group" id="confirmGroup" style="display:none;">
+          <label class="form-label" for="confirmPassword">Confirm Password</label>
+          <div class="input-wrap">
+            <input class="form-input" type="password" id="confirmPassword" placeholder="••••••••">
+            <div class="input-glow"></div>
+          </div>
+        </div>
+
+        <div class="form-options" id="loginOptions">
+          <label class="checkbox-label">
+            <input type="checkbox" id="remember">
+            <div class="checkbox-box"></div>
+            Remember me
+          </label>
+          <span class="forgot-link">Forgot password?</span>
+        </div>
+
+        <button class="btn-main" id="submitBtn" onclick="handleSubmit()">
+          <span id="btnText">Sign In</span>
+        </button>
       </div>
 
-      <div class="form-options" id="loginOptions">
-        <label class="checkbox-label">
-          <input type="checkbox" id="remember">
-          <div class="checkbox-box"></div>
-          Remember me
-        </label>
-        <span class="forgot-link">Forgot password?</span>
+      <!-- STEP 2: In-class verification code -->
+      <div class="step" id="step2">
+        <div class="login-header">
+          <div class="divider-line"><div class="divider-gem"></div></div>
+          <h2 class="login-title">Verification</h2>
+          <p class="login-subtitle" id="verifySubtitle">Signed in as —</p>
+        </div>
+
+        <div id="verifyMsg" class="msg"></div>
+
+        <div class="form-group">
+          <label class="form-label" for="classCode">Class Code</label>
+          <div class="input-wrap">
+            <input class="form-input code-input" type="text" id="classCode" placeholder="• • • •" maxlength="12" autocomplete="off">
+            <div class="input-glow"></div>
+          </div>
+        </div>
+        <p class="code-hint">Enter the code given in class to confirm your attendance.</p>
+
+        <button class="btn-main" id="verifyBtn" onclick="handleVerify()">
+          <span id="verifyBtnText">Verify</span>
+        </button>
+        <button class="btn-secondary" onclick="backToLogin()">← Sign in as someone else</button>
       </div>
 
-      <button class="btn-main" id="submitBtn" onclick="handleSubmit()">
-        <span id="btnText">Sign In</span>
-      </button>
     </div>
   </div>
 </div>
 
 <script>
+  /* ============================================================
+     CLASS CODE — change this before each session and tell
+     students the code out loud (or write it on the board).
+     Codes are matched case-insensitively and ignore extra spaces.
+     ============================================================ */
+  const CLASS_CODE = "AURUM2026";
+
   let mode = 'login';
+  let currentEmail = '';
 
   function switchTab(newMode) {
     mode = newMode;
@@ -171,19 +215,19 @@
     document.getElementById('btnText').textContent      = newMode === 'login' ? 'Sign In' : 'Create Account';
     document.getElementById('confirmGroup').style.display = newMode === 'register' ? 'block' : 'none';
     document.getElementById('loginOptions').style.display = newMode === 'login'    ? 'flex'  : 'none';
-    clearMsg();
+    clearMsg('statusMsg');
     document.getElementById('submitBtn').classList.remove('success');
   }
 
-  function showMsg(text, type) {
-    const el = document.getElementById('statusMsg');
+  function showMsg(id, text, type) {
+    const el = document.getElementById(id);
     el.textContent = text;
     el.className = `msg ${type} show`;
     if (type === 'error') setTimeout(() => el.classList.remove('show'), 5000);
   }
 
-  function clearMsg() {
-    document.getElementById('statusMsg').classList.remove('show');
+  function clearMsg(id) {
+    document.getElementById(id).classList.remove('show');
   }
 
   async function handleSubmit() {
@@ -192,13 +236,13 @@
     const btn      = document.getElementById('submitBtn');
     const btnText  = document.getElementById('btnText');
 
-    if (!email)    { showMsg('Please enter your email address.', 'error'); return; }
-    if (!password) { showMsg('Please enter your password.', 'error'); return; }
+    if (!email)    { showMsg('statusMsg', 'Please enter your email address.', 'error'); return; }
+    if (!password) { showMsg('statusMsg', 'Please enter your password.', 'error'); return; }
 
     if (mode === 'register') {
       const confirm = document.getElementById('confirmPassword').value;
-      if (password !== confirm) { showMsg('Passwords do not match.', 'error'); return; }
-      if (password.length < 8)  { showMsg('Password must be at least 8 characters.', 'error'); return; }
+      if (password !== confirm) { showMsg('statusMsg', 'Passwords do not match.', 'error'); return; }
+      if (password.length < 8)  { showMsg('statusMsg', 'Password must be at least 8 characters.', 'error'); return; }
     }
 
     btn.disabled = true;
@@ -215,19 +259,66 @@
       const data = await res.json();
 
       if (!res.ok) {
-        showMsg(data.error || 'Something went wrong.', 'error');
+        showMsg('statusMsg', data.error || 'Something went wrong.', 'error');
         btn.disabled = false;
         btnText.textContent = mode === 'login' ? 'Sign In' : 'Create Account';
       } else {
-        btn.classList.add('success');
-        btnText.textContent = '✓  ' + (mode === 'login' ? 'Access Granted' : 'Account Created');
-        showMsg(mode === 'login' ? `Welcome back, ${data.email}` : `Account created for ${data.email}`, 'success-msg');
-        // In a real app: window.location.href = '/dashboard';
+        currentEmail = data.email || email;
+        if (mode === 'login') {
+          // Move straight into the in-class verification step
+          goToStep2(currentEmail);
+        } else {
+          btn.classList.add('success');
+          btnText.textContent = '✓  Account Created';
+          showMsg('statusMsg', `Account created for ${currentEmail}. You can now sign in.`, 'success-msg');
+          btn.disabled = false;
+        }
       }
     } catch (err) {
-      showMsg('Could not reach the server. Is it running?', 'error');
+      showMsg('statusMsg', 'Could not reach the server. Is it running?', 'error');
       btn.disabled = false;
       btnText.textContent = mode === 'login' ? 'Sign In' : 'Create Account';
+    }
+  }
+
+  function goToStep2(email) {
+    document.getElementById('step1').classList.remove('active');
+    document.getElementById('step2').classList.add('active');
+    document.getElementById('verifySubtitle').textContent = `Signed in as ${email}`;
+    document.getElementById('classCode').value = '';
+    clearMsg('verifyMsg');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const verifyBtnText = document.getElementById('verifyBtnText');
+    verifyBtn.disabled = false;
+    verifyBtn.classList.remove('success');
+    verifyBtnText.textContent = 'Verify';
+    setTimeout(() => document.getElementById('classCode').focus(), 100);
+  }
+
+  function backToLogin() {
+    document.getElementById('step2').classList.remove('active');
+    document.getElementById('step1').classList.add('active');
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('submitBtn').classList.remove('success');
+    document.getElementById('btnText').textContent = mode === 'login' ? 'Sign In' : 'Create Account';
+  }
+
+  function handleVerify() {
+    const entered = document.getElementById('classCode').value.trim().toUpperCase();
+    const expected = CLASS_CODE.trim().toUpperCase();
+    const verifyBtn = document.getElementById('verifyBtn');
+    const verifyBtnText = document.getElementById('verifyBtnText');
+
+    if (!entered) { showMsg('verifyMsg', 'Please enter the class code.', 'error'); return; }
+
+    if (entered === expected) {
+      verifyBtn.classList.add('success');
+      verifyBtn.disabled = true;
+      verifyBtnText.textContent = '✓  Attendance Confirmed';
+      showMsg('verifyMsg', `Welcome, ${currentEmail}. Attendance confirmed.`, 'success-msg');
+      // In a real app: window.location.href = '/dashboard';
+    } else {
+      showMsg('verifyMsg', 'Incorrect code. Please try again.', 'error');
     }
   }
 
@@ -235,6 +326,7 @@
     const el = document.getElementById(id);
     if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') handleSubmit(); });
   });
+  document.getElementById('classCode').addEventListener('keydown', e => { if (e.key === 'Enter') handleVerify(); });
 </script>
 </body>
 </html>
